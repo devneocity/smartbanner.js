@@ -1,6 +1,6 @@
 function valid(name) {
   // TODO: validate against options dictionary
-  return name.indexOf('smartbanner:') !== -1 && name.split(':')[1].length > 0;
+  return name.indexOf('neocitybanner:') !== -1 && name.split(':')[1].length > 0;
 }
 
 function convertToCamelCase(name) {
