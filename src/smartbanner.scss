@@ -16,7 +16,6 @@ $black: #000;
   background: $light-grey;
 
   font-family: Helvetica, sans, sans-serif;
-
   &__exit {
 
     position: absolute;
@@ -33,26 +32,6 @@ $black: #000;
     border: 0;
 
     text-align: center;
-
-    &::before,
-    &::after {
-      position: absolute;
-
-      width: 1px;
-      height: 12px;
-
-      background: $grey;
-
-      content: ' ';
-    }
-
-    &::before {
-      transform: rotate(45deg);
-    }
-
-    &::after {
-      transform: rotate(-45deg);
-    }
   }
 
   &__icon {
@@ -84,9 +63,15 @@ $black: #000;
     color: $black;
 
     &__title {
+      font-weight: bold;
       font-size: 14px;
+      line-height: 19px;
     }
-
+    &__author {
+      font-weight: bold;
+      font-size: 12px;
+      line-height: 16px;
+    }
     &__author,
     &__price {
       font-size: 12px;
@@ -100,16 +85,18 @@ $black: #000;
     right: 10px;
     z-index: 1;
 
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 0 10px;
     min-width: 10%;
+    height: 28px;
+    background: #308DDF;
+    border-radius: 3.75px;
 
-    border-radius: 5px;
-
-    background: $light-grey;
-
-    color: $blue;
-    font-size: 18px;
+    color: white;
+    font-weight: bold;
+    font-size: 9.75px;
     text-align: center;
     text-decoration: none;
 
@@ -170,6 +157,13 @@ $black: #000;
       &__title {
         color: #fff;
         font-weight: bold;
+        font-size: 14px;
+        line-height: 19px;
+      }
+
+      &__author,
+      &__price {
+        color: #fff;
       }
     }
 
@@ -182,34 +176,22 @@ $black: #000;
 
       border-radius: 0;
       background: none;
-      box-shadow: 0 0 0 1px #333, 0 0 0 2px #dddcdc;
-
-      color: #d1d1d1;
-      font-size: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 10px;
+      min-width: 10%;
+      height: 28px;
+      background: #308DDF;
+      border-radius: 3.75px;
+  
+      color: white;
       font-weight: bold;
+      font-size: 9.75px;
 
       &:active,
       &:hover {
         background: none;
-      }
-
-      &__label {
-        display: block;
-        padding: 0 10px;
-
-        background: #42b6c9;
-        background: linear-gradient(to bottom, #42b6c9, #39a9bb);
-        box-shadow: none;
-
-        line-height: 24px;
-        text-align: center;
-        text-shadow: none;
-        text-transform: none;
-
-        &:active,
-        &:hover {
-          background: #2ac7e1;
-        }
       }
     }
   }

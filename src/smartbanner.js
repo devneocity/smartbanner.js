@@ -116,8 +116,12 @@ export default class SmartBanner {
 
   get html() {
     let modifier = !this.options.customDesignModifier ? this.platform : this.options.customDesignModifier;
+    let closeUrl = '../smartbanner.js/dist/close.svg';
+    if (modifier === 'android') {
+      closeUrl = '../smartbanner.js/dist/close-light.svg';
+    }
     return `<div class="smartbanner smartbanner--${modifier} js_smartbanner">
-      <a href="javascript:void();" class="smartbanner__exit js_smartbanner__exit"></a>
+      <a href="javascript:void();" class="smartbanner__exit js_smartbanner__exit"><img src="${closeUrl}"></a>
       <div class="smartbanner__icon" style="background-image: url(${this.icon});"></div>
       <div class="smartbanner__info">
         <div>
