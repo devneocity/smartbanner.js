@@ -577,6 +577,8 @@ function () {
       }
 
       var bannerDiv = document.createElement('div');
+      var body = document.getElementsByTagName('body')[0];
+      body.style.paddingTop = '84px';
       document.querySelector('body').appendChild(bannerDiv);
       bannerDiv.outerHTML = this.html;
       var event = new Event('smartbanner.view');
@@ -605,6 +607,8 @@ function () {
         restoreContentPosition();
       }
 
+      var body = document.getElementsByTagName('body')[0];
+      body.style.paddingTop = '0px';
       var banner = document.querySelector('.js_smartbanner');
       document.querySelector('body').removeChild(banner);
       var event = new Event('smartbanner.exit');

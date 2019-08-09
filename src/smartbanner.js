@@ -210,6 +210,8 @@ export default class SmartBanner {
     }
 
     let bannerDiv = document.createElement('div');
+    let body = document.getElementsByTagName('body')[0];
+    body.style.paddingTop = '84px';
     document.querySelector('body').appendChild(bannerDiv);
     bannerDiv.outerHTML = this.html;
     let event = new Event('smartbanner.view');
@@ -227,6 +229,8 @@ export default class SmartBanner {
     if (!this.positioningDisabled) {
       restoreContentPosition();
     }
+    const body = document.getElementsByTagName('body')[0];
+    body.style.paddingTop = '0px';
     let banner = document.querySelector('.js_smartbanner');
     document.querySelector('body').removeChild(banner);
     let event = new Event('smartbanner.exit');

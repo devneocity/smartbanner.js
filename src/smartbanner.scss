@@ -79,14 +79,6 @@ $black: #000;
 
   }
 
-  @media screen and (max-width: 360px) {
-    &__icon {
-      display: none;
-    }
-    &__info {
-      left: 50px;
-    }
-  }
 
   &__button {
     position: absolute;
@@ -116,8 +108,7 @@ $black: #000;
 
   /** Android styles **/
   &.smartbanner--android {
-    background: #3d3d3d url(data:image/gif;base64,R0lGODlhCAAIAIABAFVVVf///yH5BAEHAAEALAAAAAAIAAgAAAINRG4XudroGJBRsYcxKAA7);
-    box-shadow: inset 0 4px 0 #88b131;
+    background: #3d3d3d;
 
     .smartbanner__exit {
       left: 6px;
@@ -178,7 +169,7 @@ $black: #000;
 
     .smartbanner__button {
       top: 30px;
-      right: 20px;
+      right: 5px;
 
       padding: 0;
       min-width: 12%;
@@ -197,6 +188,18 @@ $black: #000;
       color: white;
       font-weight: bold;
       font-size: 9.75px;
+    }
+  }
+
+  @media screen and (max-width: 320px) {
+    &__icon {
+      display: none;
+    }
+    &__info {
+      left: 50px;
+    }
+    &__button {
+      right: 5px;
     }
   }
 }
