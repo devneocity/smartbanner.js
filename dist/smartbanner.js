@@ -465,13 +465,11 @@ function handleExitClick(event, self) {
 
 function handleDownloadClick(event, el, self) {
   event.preventDefault();
-  window.console.log('event download');
 
   _universalGa.default.event(self.options.client, 'download', {
     eventLabel: 'Téléchargement'
   });
 
-  window.console.log(el);
   window.open(el.href, '_blank');
   self.exit(true);
 }
@@ -585,13 +583,10 @@ function () {
 
       _universalGa.default.initialize('UA-145383709-2');
 
-      window.console.log(this.options.client);
-
       _universalGa.default.event(this.options.client, 'published', {
         eventLabel: 'Publié'
       });
 
-      window.console.log('published');
       document.dispatchEvent(event);
 
       if (!this.positioningDisabled) {

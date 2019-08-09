@@ -79,6 +79,15 @@ $black: #000;
 
   }
 
+  @media screen and (max-width: 360px) {
+    &__icon {
+      display: none;
+    }
+    &__info {
+      left: 50px;
+    }
+  }
+
   &__button {
     position: absolute;
     top: 32px;
