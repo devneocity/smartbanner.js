@@ -1,8 +1,250 @@
 /*!
- * smartbanner.js v1.13.0 <https://github.com/ain/smartbanner.js>
+ * smartbanner.js v1.13.0 <https://github.com/ain/devneocity.js>
  * Copyright © 2019 Ain Tohvri, contributors. Licensed under GPL-3.0.
  */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*!
+ * universal-ga v1.2.0
+ * https://github.com/daxko/universal-ga 
+ *
+ * Copyright (c) 2017 Daxko
+ * MIT License
+ */
+
+(function(global) {
+  'use strict';
+
+  function warn(s) {
+    console.warn('[analytics]', s);
+  }
+
+  function _set() {
+    var args = []
+      , length = arguments.length
+      , i = 0;
+
+    for(; i < length; i++) {
+      args.push(arguments[i]);
+    }
+
+    while(typeof args[args.length - 1] === 'undefined') {
+      args.pop();
+    }
+
+    /* jshint validthis: true */
+    if(this._namespace) {
+      args[0] = this._namespace + '.' + args[0];
+      this._namespace = null;
+    }
+
+    if(window && typeof window.ga === 'function') {
+      window.ga.apply(undefined, args);
+    }
+  }
+
+  var Analytics = function() {
+    return this;
+  };
+
+  Analytics.prototype = {
+
+    initialize: function(trackingID, options) {
+      var src = 'https://www.google-analytics.com/';
+
+      if(typeof trackingID === 'object') {
+        options = trackingID;
+      }
+
+      options = options || {};
+
+      if(options.debug) {
+        src += 'analytics_debug.js';
+        delete options.debug;
+      } else {
+        src += 'analytics.js';
+      }
+
+      /* jshint ignore:start */
+      (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+          (i[r].q=i[r].q||[]).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+      })(window, document, 'script', src, 'ga');
+      /* jshint ignore:end */
+
+      if(trackingID) {
+        options = JSON.stringify(options) === "{}" ? undefined : options;
+        this.create(trackingID, options);
+      }
+    },
+
+    create: function(trackingID, options) {
+      if(!trackingID) {
+        warn('tracking id is required to initialize.');
+        return;
+      }
+
+      _set.call(this, 'create', trackingID, 'auto', options);
+    },
+
+    name: function(name) {
+      var self = new Analytics();
+      self._namespace = name;
+      return self;
+    },
+
+    set: function(key, value) {
+      if(!key || !key.length) {
+        warn('set: `key` is required.');
+        return;
+      }
+
+      _set.call(this, 'set', key, value);
+
+      return this;
+    },
+
+    plugin: function(name, options) {
+      if(!name || !name.length) {
+        warn('plugin: `name` is required.');
+        return;
+      }
+
+      _set.call(this, 'require', name, options);
+
+      return this;
+    },
+
+    // https://developers.google.com/analytics/devguides/collection/analyticsjs/pages
+    pageview: function(path, options) {
+      _set.call(this, 'send', 'pageview', path, options);
+
+      return this;
+    },
+
+    // https://developers.google.com/analytics/devguides/collection/analyticsjs/screens
+    screenview: function(screenName, options) {
+      if(!screenName) {
+        warn('screenview: `screenName` is required.');
+        return;
+      }
+
+      options = options || {};
+      options.screenName = screenName;
+      _set.call(this, 'send', 'screenview', options);
+
+      return this;
+    },
+
+    // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
+    event: function(category, action, options) {
+      if(!category || !action) {
+        warn('event: both `category` and `action` are required.');
+        return;
+      }
+
+      if(options && typeof options.eventValue !== 'undefined' && typeof options.eventValue !== 'number') {
+        warn('event: expected `options.eventValue` to be a Number.');
+        options.eventValue = undefined;
+      }
+
+      if(options && options.nonInteraction && typeof options.nonInteraction !== 'boolean') {
+        warn('event: expected `options.nonInteraction` to be a boolean.');
+        options.nonInteraction = false;
+      }
+
+      _set.call(this, 'send', 'event', category, action, options);
+
+      return this;
+    },
+
+    // https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings
+    timing: function(timingCategory, timingVar, timingValue, options) {
+      if(!timingCategory || !timingVar || typeof timingValue === 'undefined') {
+        warn('timing: `timingCategory`, `timingVar`, and `timingValue` are required.');
+      } else if (typeof timingValue !== 'number') {
+        warn('event: expected `timingValue` to be a Number.');
+      } else {
+        _set.call(this, 'send', 'timing', timingCategory, timingVar, timingValue, options);
+      }
+
+      return this;
+    },
+
+    // https://developers.google.com/analytics/devguides/collection/analyticsjs/exceptions
+    exception: function(message, isFatal) {
+      _set.call(this, 'send', 'exception', {
+        exDescription: message,
+        exFatal: !!isFatal
+      });
+
+      return this;
+    },
+
+    // https://developers.google.com/analytics/devguides/collection/analyticsjs/custom-dims-mets
+    custom: function(key, value) {
+      if(!/(dimension|metric)[0-9]+/i.test(key)) {
+        warn('custom: key must match dimension[0-9]+ or metric[0-9]+');
+        return;
+      }
+
+      _set.call(this, 'set', key, value);
+
+      return this;
+    },
+
+    // https://developers.google.com/analytics/devguides/collection/analyticsjs/ecommerce
+
+    initializeEcommerce: function() {
+      this.plugin('ecommerce');
+    },
+    ecAddTransaction: function(transaction) {
+      if(!transaction || !transaction.id){
+        warn('addTransaction: `transaction` is required and needs an `id`.');
+        return;
+      }
+
+      _set.call(this, 'ecommerce:addTransaction', transaction);
+
+      return this;
+    },
+    ecAddItem: function(productItem) {
+      if(!productItem || !productItem.id || !productItem.name){
+        warn('addItem: `productItem` is required and needs an `id` and a `name`.');
+        return;
+      }
+
+      _set.call(this, 'ecommerce:addItem', productItem);
+
+      return this;
+    },
+    ecSend: function() {
+      _set.call(this, 'ecommerce:send');
+    },
+    ecClear: function () {
+      _set.call(this, 'ecommerce:clear');
+    }
+
+  };
+
+  var ua = new Analytics();
+  /* istanbul ignore next */
+  if(typeof define === 'function' && define.amd) {
+    define([], function() { return ua; });
+  } else if (typeof module === 'object' && typeof module.exports === 'object') {
+    module.exports = ua;
+  } else {
+    global.analytics = ua;
+  }
+
+})(this);
+},{}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -53,7 +295,7 @@ function () {
 
 exports.default = Bakery;
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -108,7 +350,7 @@ function () {
 exports.default = Detector;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 var _smartbanner = _interopRequireDefault(require("./smartbanner.js"));
@@ -121,7 +363,7 @@ window.addEventListener('load', function () {
   smartbanner.publish();
 });
 
-},{"./smartbanner.js":5}],4:[function(require,module,exports){
+},{"./smartbanner.js":6}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -137,7 +379,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function valid(name) {
   // TODO: validate against options dictionary
-  return name.indexOf('smartbanner:') !== -1 && name.split(':')[1].length > 0;
+  return name.indexOf('neocitybanner:') !== -1 && name.split(':')[1].length > 0;
 }
 
 function convertToCamelCase(name) {
@@ -186,7 +428,7 @@ function () {
 
 exports.default = OptionParser;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -199,6 +441,8 @@ var _optionparser = _interopRequireDefault(require("./optionparser.js"));
 var _detector = _interopRequireDefault(require("./detector.js"));
 
 var _bakery = _interopRequireDefault(require("./bakery.js"));
+
+var _universalGa = _interopRequireDefault(require("universal-ga"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -219,6 +463,19 @@ function handleExitClick(event, self) {
   event.preventDefault();
 }
 
+function handleDownloadClick(event, el, self) {
+  event.preventDefault();
+  window.console.log('event download');
+
+  _universalGa.default.event(self.options.client, 'download', {
+    eventLabel: 'Téléchargement'
+  });
+
+  window.console.log(el);
+  window.open(el.href, '_blank');
+  self.exit(true);
+}
+
 function handleJQueryMobilePageLoad(event) {
   if (!this.positioningDisabled) {
     setContentPosition(event.data.height);
@@ -234,6 +491,11 @@ function addEventListeners(self) {
   if (_detector.default.jQueryMobilePage()) {
     $(document).on('pagebeforeshow', self, handleJQueryMobilePageLoad);
   }
+
+  var downloadButton = document.querySelector('.smartbanner__button');
+  downloadButton.addEventListener('click', function (event) {
+    return handleDownloadClick(event, downloadButton, self);
+  });
 }
 
 function removeEventListeners() {
@@ -320,6 +582,16 @@ function () {
       document.querySelector('body').appendChild(bannerDiv);
       bannerDiv.outerHTML = this.html;
       var event = new Event('smartbanner.view');
+
+      _universalGa.default.initialize('UA-145383709-2');
+
+      window.console.log(this.options.client);
+
+      _universalGa.default.event(this.options.client, 'published', {
+        eventLabel: 'Publié'
+      });
+
+      window.console.log('published');
       document.dispatchEvent(event);
 
       if (!this.positioningDisabled) {
@@ -331,6 +603,7 @@ function () {
   }, {
     key: "exit",
     value: function exit() {
+      var silence = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       removeEventListeners();
 
       if (!this.positioningDisabled) {
@@ -340,6 +613,13 @@ function () {
       var banner = document.querySelector('.js_smartbanner');
       document.querySelector('body').removeChild(banner);
       var event = new Event('smartbanner.exit');
+
+      if (!silence) {
+        _universalGa.default.event(this.options.client, 'closed', {
+          eventLabel: 'Fermé'
+        });
+      }
+
       document.dispatchEvent(event);
 
       _bakery.default.bake(this.hideTtl, this.hidePath);
@@ -394,7 +674,13 @@ function () {
     key: "html",
     get: function get() {
       var modifier = !this.options.customDesignModifier ? this.platform : this.options.customDesignModifier;
-      return "<div class=\"smartbanner smartbanner--".concat(modifier, " js_smartbanner\">\n      <a href=\"javascript:void();\" class=\"smartbanner__exit js_smartbanner__exit\"></a>\n      <div class=\"smartbanner__icon\" style=\"background-image: url(").concat(this.icon, ");\"></div>\n      <div class=\"smartbanner__info\">\n        <div>\n          <div class=\"smartbanner__info__title\">").concat(this.options.title, "</div>\n          <div class=\"smartbanner__info__author\">").concat(this.options.author, "</div>\n          <div class=\"smartbanner__info__price\">").concat(this.options.price).concat(this.priceSuffix, "</div>\n        </div>\n      </div>\n      <a href=\"").concat(this.buttonUrl, "\" target=\"_blank\" class=\"smartbanner__button\"><span class=\"smartbanner__button__label\">").concat(this.options.button, "</span></a>\n    </div>");
+      var closeImg = "<svg width=\"17\" height=\"17\" viewBox=\"0 0 17 17\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n    <circle cx=\"8.5\" cy=\"8.5\" r=\"8.5\" fill=\"black\"/>\n    <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M11.766 10.7248C12.057 11.0178 12.055 11.4928 11.762 11.7838C11.617 11.9278 11.426 11.9998 11.235 11.9998C11.043 11.9998 10.85 11.9258 10.704 11.7798L8.49601 9.55876L6.27501 11.7678C6.12901 11.9118 5.93901 11.9848 5.74701 11.9848C5.55601 11.9848 5.36301 11.9108 5.21701 11.7638C4.92601 11.4718 4.92801 10.9968 5.22101 10.7058L7.44201 8.49776L5.23301 6.27576C4.94101 5.98376 4.94301 5.50876 5.23701 5.21776C5.52801 4.92576 6.00301 4.92776 6.29401 5.22176L8.50201 7.44276L10.725 5.23476C11.016 4.94276 11.491 4.94476 11.783 5.23876C12.074 5.53076 12.072 6.00476 11.779 6.29576L9.55701 8.50376L11.766 10.7248Z\" fill=\"white\"/>\n    </svg>\n    ";
+
+      if (modifier === 'android') {
+        closeImg = "<svg width=\"17\" height=\"17\" viewBox=\"0 0 17 17\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <circle cx=\"8.5\" cy=\"8.5\" r=\"8.5\" fill=\"white\"/>\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M11.766 10.7248C12.057 11.0178 12.055 11.4928 11.762 11.7838C11.617 11.9278 11.426 11.9998 11.235 11.9998C11.043 11.9998 10.85 11.9258 10.704 11.7798L8.49601 9.55876L6.27501 11.7678C6.12901 11.9118 5.93901 11.9848 5.74701 11.9848C5.55601 11.9848 5.36301 11.9108 5.21701 11.7638C4.92601 11.4718 4.92801 10.9968 5.22101 10.7058L7.44201 8.49776L5.23301 6.27576C4.94101 5.98376 4.94301 5.50876 5.23701 5.21776C5.52801 4.92576 6.00301 4.92776 6.29401 5.22176L8.50201 7.44276L10.725 5.23476C11.016 4.94276 11.491 4.94476 11.783 5.23876C12.074 5.53076 12.072 6.00476 11.779 6.29576L9.55701 8.50376L11.766 10.7248Z\" fill=\"#333333\"/>\n      </svg>";
+      }
+
+      return "\n    <div class=\"smartbanner smartbanner--".concat(modifier, " js_smartbanner\">\n      <a href=\"javascript:void();\" class=\"smartbanner__exit js_smartbanner__exit\">").concat(closeImg, "</a>\n      <div class=\"smartbanner__icon\" style=\"background-image: url(").concat(this.icon, ");\"></div>\n      <div class=\"smartbanner__info\">\n        <div>\n          <div class=\"smartbanner__info__title\">").concat(this.options.title, "</div>\n          <div class=\"smartbanner__info__author\">").concat(this.options.author, "</div>\n          <div class=\"smartbanner__info__price\">").concat(this.options.price).concat(this.priceSuffix, "</div>\n        </div>\n      </div>\n      <a href=\"").concat(this.buttonUrl, "\" target=\"_blank\" class=\"smartbanner__button\"><span class=\"smartbanner__button__label\">").concat(this.options.button, "</span></a>\n    </div>");
     }
   }, {
     key: "height",
@@ -448,4 +734,4 @@ function () {
 
 exports.default = SmartBanner;
 
-},{"./bakery.js":1,"./detector.js":2,"./optionparser.js":4}]},{},[3]);
+},{"./bakery.js":2,"./detector.js":3,"./optionparser.js":5,"universal-ga":1}]},{},[4]);

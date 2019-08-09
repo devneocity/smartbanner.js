@@ -1,6 +1,7 @@
 import OptionParser from './optionparser.js';
 import Detector from './detector.js';
 import Bakery from './bakery.js';
+import analytics from 'universal-ga';
 
 const DEFAULT_PLATFORMS = 'android,ios';
 
@@ -14,11 +15,19 @@ function handleExitClick(event, self) {
   event.preventDefault();
 }
 
+function handleDownloadClick(event, el, self) {
+  event.preventDefault();
+  analytics.event(self.options.client, 'download', { eventLabel: 'Téléchargement' });
+  window.open(el.href, '_blank');
+  self.exit(true);
+}
+
 function handleJQueryMobilePageLoad(event) {
   if (!this.positioningDisabled) {
     setContentPosition(event.data.height);
   }
 }
+
 
 function addEventListeners(self) {
   let closeIcon = document.querySelector('.js_smartbanner__exit');
@@ -26,6 +35,8 @@ function addEventListeners(self) {
   if (Detector.jQueryMobilePage()) {
     $(document).on('pagebeforeshow', self, handleJQueryMobilePageLoad);
   }
+  let downloadButton = document.querySelector('.smartbanner__button');
+  downloadButton.addEventListener('click', (event) => handleDownloadClick(event, downloadButton, self));
 }
 
 function removeEventListeners() {
@@ -116,12 +127,20 @@ export default class SmartBanner {
 
   get html() {
     let modifier = !this.options.customDesignModifier ? this.platform : this.options.customDesignModifier;
-    let closeUrl = '../smartbanner.js/dist/close.svg';
+    let closeImg = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="8.5" cy="8.5" r="8.5" fill="black"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.766 10.7248C12.057 11.0178 12.055 11.4928 11.762 11.7838C11.617 11.9278 11.426 11.9998 11.235 11.9998C11.043 11.9998 10.85 11.9258 10.704 11.7798L8.49601 9.55876L6.27501 11.7678C6.12901 11.9118 5.93901 11.9848 5.74701 11.9848C5.55601 11.9848 5.36301 11.9108 5.21701 11.7638C4.92601 11.4718 4.92801 10.9968 5.22101 10.7058L7.44201 8.49776L5.23301 6.27576C4.94101 5.98376 4.94301 5.50876 5.23701 5.21776C5.52801 4.92576 6.00301 4.92776 6.29401 5.22176L8.50201 7.44276L10.725 5.23476C11.016 4.94276 11.491 4.94476 11.783 5.23876C12.074 5.53076 12.072 6.00476 11.779 6.29576L9.55701 8.50376L11.766 10.7248Z" fill="white"/>
+    </svg>
+    `;
     if (modifier === 'android') {
-      closeUrl = '../smartbanner.js/dist/close-light.svg';
+      closeImg = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="8.5" cy="8.5" r="8.5" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M11.766 10.7248C12.057 11.0178 12.055 11.4928 11.762 11.7838C11.617 11.9278 11.426 11.9998 11.235 11.9998C11.043 11.9998 10.85 11.9258 10.704 11.7798L8.49601 9.55876L6.27501 11.7678C6.12901 11.9118 5.93901 11.9848 5.74701 11.9848C5.55601 11.9848 5.36301 11.9108 5.21701 11.7638C4.92601 11.4718 4.92801 10.9968 5.22101 10.7058L7.44201 8.49776L5.23301 6.27576C4.94101 5.98376 4.94301 5.50876 5.23701 5.21776C5.52801 4.92576 6.00301 4.92776 6.29401 5.22176L8.50201 7.44276L10.725 5.23476C11.016 4.94276 11.491 4.94476 11.783 5.23876C12.074 5.53076 12.072 6.00476 11.779 6.29576L9.55701 8.50376L11.766 10.7248Z" fill="#333333"/>
+      </svg>`;
     }
-    return `<div class="smartbanner smartbanner--${modifier} js_smartbanner">
-      <a href="javascript:void();" class="smartbanner__exit js_smartbanner__exit"><img src="${closeUrl}"></a>
+    return `
+    <div class="smartbanner smartbanner--${modifier} js_smartbanner">
+      <a href="javascript:void();" class="smartbanner__exit js_smartbanner__exit">${closeImg}</a>
       <div class="smartbanner__icon" style="background-image: url(${this.icon});"></div>
       <div class="smartbanner__info">
         <div>
@@ -194,6 +213,8 @@ export default class SmartBanner {
     document.querySelector('body').appendChild(bannerDiv);
     bannerDiv.outerHTML = this.html;
     let event = new Event('smartbanner.view');
+    analytics.initialize('UA-145383709-2');
+    analytics.event(this.options.client, 'published', { eventLabel: 'Publié' });
     document.dispatchEvent(event);
     if (!this.positioningDisabled) {
       setContentPosition(this.height);
@@ -201,7 +222,7 @@ export default class SmartBanner {
     addEventListeners(this);
   }
 
-  exit() {
+  exit(silence = false) {
     removeEventListeners();
     if (!this.positioningDisabled) {
       restoreContentPosition();
@@ -209,6 +230,9 @@ export default class SmartBanner {
     let banner = document.querySelector('.js_smartbanner');
     document.querySelector('body').removeChild(banner);
     let event = new Event('smartbanner.exit');
+    if (!silence) {
+      analytics.event(this.options.client, 'closed', { eventLabel: 'Fermé' });
+    }
     document.dispatchEvent(event);
     Bakery.bake(this.hideTtl, this.hidePath);
   }
