@@ -14,53 +14,44 @@ $black: #000;
   height: 84px;
 
   background: $light-grey;
-
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   font-family: Helvetica, sans, sans-serif;
   &__exit {
-
-    position: absolute;
-    top: calc(50% - 6px);
-    left: 9px;
-
     display: block;
     margin: 0;
-
-
     width: 12px;
     height: 12px;
-
     border: 0;
-
     text-align: center;
+    margin-left: 9px;
+    margin-right: 9px;
+    flex-shrink: 0;
   }
 
   &__icon {
-    position: absolute;
-
     top: 10px;
     left: 30px;
-
     width: 64px;
     height: 64px;
-
     border-radius: 15px;
     background-size: 64px 64px;
+    margin-right: 9px;
+    flex-shrink: 0;
   }
 
   &__info {
-    position: absolute;
-
-    top: 10px;
-    left: 104px;
-
     display: flex;
-    overflow-y: hidden;
-    width: 60%;
     height: 64px;
-
+    justify-content: space-between;
+    width: auto;
     align-items: center;
-
+    flex-grow: 2;
     color: $black;
+    div {
+      flex-shrink: 1;
+    }
 
     &__title {
       font-weight: bold;
@@ -78,17 +69,11 @@ $black: #000;
     }
 
   }
-
-
   &__button {
-    position: absolute;
-    top: 32px;
-    right: 10px;
-    z-index: 1;
-
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
     padding: 0 10px;
     min-width: 10%;
     height: 28px;
@@ -100,7 +85,9 @@ $black: #000;
     font-size: 9.75px;
     text-align: center;
     text-decoration: none;
-
+    text-shadow: none;
+    margin-left: 9px;
+    margin-right: 9px;
     &__label {
       text-align: center;
     }
@@ -184,7 +171,7 @@ $black: #000;
       height: 28px;
       background: #308DDF;
       border-radius: 3.75px;
-  
+
       color: white;
       font-weight: bold;
       font-size: 9.75px;
@@ -192,9 +179,6 @@ $black: #000;
   }
 
   @media screen and (max-width: 320px) {
-    &__icon {
-      display: none;
-    }
     &__info {
       left: 50px;
     }
