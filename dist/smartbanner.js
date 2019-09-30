@@ -5,7 +5,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
  * universal-ga v1.2.0
- * https://github.com/daxko/universal-ga 
+ * https://github.com/daxko/universal-ga
  *
  * Copyright (c) 2017 Daxko
  * MIT License
@@ -37,8 +37,8 @@
       this._namespace = null;
     }
 
-    if(window && typeof window.ga === 'function') {
-      window.ga.apply(undefined, args);
+    if(window && typeof window.neoGa === 'function') {
+      window.neoGa.apply(undefined, args);
     }
   }
 
@@ -75,7 +75,7 @@
         a.async = 1;
         a.src = g;
         m.parentNode.insertBefore(a, m)
-      })(window, document, 'script', src, 'ga');
+      })(window, document, 'script', src, 'neoGa');
       /* jshint ignore:end */
 
       if(trackingID) {
@@ -244,6 +244,7 @@
   }
 
 })(this);
+
 },{}],2:[function(require,module,exports){
 "use strict";
 
@@ -466,7 +467,7 @@ function handleExitClick(event, self) {
 function handleDownloadClick(event, el, self) {
   event.preventDefault();
 
-  _universalGa.default.event(self.options.client, 'download', {
+  _universalGa.default.name('neobannertracker').event(self.options.client, 'download', {
     eventLabel: 'Téléchargement'
   });
 
@@ -583,9 +584,11 @@ function () {
       bannerDiv.outerHTML = this.html;
       var event = new Event('smartbanner.view');
 
-      _universalGa.default.initialize('UA-145383709-2');
+      _universalGa.default.initialize('');
 
-      _universalGa.default.event(this.options.client, 'published', {
+      _universalGa.default.create('UA-145383709-2', 'neobannertracker');
+
+      _universalGa.default.name('neobannertracker').event(this.options.client, 'published', {
         eventLabel: 'Publié'
       });
 
@@ -614,7 +617,7 @@ function () {
       var event = new Event('smartbanner.exit');
 
       if (!silence) {
-        _universalGa.default.event(this.options.client, 'closed', {
+        _universalGa.default.name('neobannertracker').event(this.options.client, 'closed', {
           eventLabel: 'Fermé'
         });
       }

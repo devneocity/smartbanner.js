@@ -17,7 +17,7 @@ function handleExitClick(event, self) {
 
 function handleDownloadClick(event, el, self) {
   event.preventDefault();
-  analytics.event(self.options.client, 'download', { eventLabel: 'Téléchargement' });
+  analytics.name('neobannertracker').event(self.options.client, 'download', { eventLabel: 'Téléchargement' });
   window.open(el.href, '_blank');
   self.exit(true);
 }
@@ -215,8 +215,9 @@ export default class SmartBanner {
     document.querySelector('body').appendChild(bannerDiv);
     bannerDiv.outerHTML = this.html;
     let event = new Event('smartbanner.view');
-    analytics.initialize('UA-145383709-2');
-    analytics.event(this.options.client, 'published', { eventLabel: 'Publié' });
+    analytics.initialize('');
+    analytics.create('UA-145383709-2', 'neobannertracker');
+    analytics.name('neobannertracker').event(this.options.client, 'published', { eventLabel: 'Publié' });
     document.dispatchEvent(event);
     if (!this.positioningDisabled) {
       setContentPosition(this.height);
@@ -235,7 +236,7 @@ export default class SmartBanner {
     document.querySelector('body').removeChild(banner);
     let event = new Event('smartbanner.exit');
     if (!silence) {
-      analytics.event(this.options.client, 'closed', { eventLabel: 'Fermé' });
+      analytics.name('neobannertracker').event(this.options.client, 'closed', { eventLabel: 'Fermé' });
     }
     document.dispatchEvent(event);
     Bakery.bake(this.hideTtl, this.hidePath);
